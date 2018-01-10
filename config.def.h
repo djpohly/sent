@@ -1,6 +1,7 @@
 /* See LICENSE file for copyright and license details. */
 
 static char *fontfallbacks[] = {
+	"ETBembo",
 	"dejavu sans",
 	"roboto",
 	"ubuntu",
@@ -13,7 +14,7 @@ static const char *colors[] = {
 	"#FFFFFF", /* background color */
 };
 
-static const float linespacing = 1.4;
+static const float linespacing = 1.2;
 
 /* how much screen estate is to be used at max for the content */
 static const float usablewidth = 0.75;
@@ -36,16 +37,14 @@ static Shortcut shortcuts[] = {
 	{ XK_Return,      advance,        {.i = +1} },
 	{ XK_space,       advance,        {.i = +1} },
 	{ XK_BackSpace,   advance,        {.i = -1} },
-	{ XK_l,           advance,        {.i = +1} },
+	{ XK_s,           advance,        {.i = +1} },
 	{ XK_h,           advance,        {.i = -1} },
-	{ XK_j,           advance,        {.i = +1} },
-	{ XK_k,           advance,        {.i = -1} },
+	{ XK_t,           advance,        {.i = +1} },
+	{ XK_n,           advance,        {.i = -1} },
 	{ XK_Down,        advance,        {.i = +1} },
 	{ XK_Up,          advance,        {.i = -1} },
 	{ XK_Next,        advance,        {.i = +1} },
 	{ XK_Prior,       advance,        {.i = -1} },
-	{ XK_n,           advance,        {.i = +1} },
-	{ XK_p,           advance,        {.i = -1} },
 	{ XK_r,           reload,         {0} },
 };
 
