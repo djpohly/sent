@@ -1,6 +1,8 @@
 /* See LICENSE file for copyright and license details. */
 #include <sys/types.h>
 #include <arpa/inet.h>
+#include <sys/inotify.h>
+#include <sys/select.h>
 
 #include <errno.h>
 #include <fcntl.h>
@@ -117,6 +119,7 @@ static void configure(XEvent *);
 
 /* Globals */
 static const char *fname = NULL;
+static char *dpart, *fpart;
 static Slide *slides = NULL;
 static int idx = 0;
 static int slidecount = 0;
@@ -124,6 +127,7 @@ static XWindow xw;
 static Drw *d = NULL;
 static Clr *sc;
 static Fnt *fonts[NUMFONTSCALES];
+static int inotify = -1;
 static int running = 1;
 
 static void (*handler[LASTEvent])(XEvent *) = {
@@ -545,11 +549,31 @@ run()
 		}
 	}
 
+	int xfd = ConnectionNumber(xw.dpy);
+	int maxfd = xfd > inotify ? xfd + 1 : inotify + 1;
+	struct inotify_event *ie = malloc(sizeof(*ie) + NAME_MAX + 1);
 	while (running) {
-		XNextEvent(xw.dpy, &ev);
-		if (handler[ev.type])
-			(handler[ev.type])(&ev);
+		fd_set fds;
+		FD_ZERO(&fds);
+		FD_SET(xfd, &fds);
+		FD_SET(inotify, &fds);
+		if (select(maxfd, &fds, NULL, NULL, NULL) < 0)
+			break;
+
+		if (FD_ISSET(inotify, &fds))
+			while (read(inotify, ie, sizeof(*ie) + NAME_MAX + 1) > 0)
+				if (!strcmp(fpart, ie->name))
+					reload(NULL);
+
+		if (FD_ISSET(xfd, &fds)) {
+			while (XPending(xw.dpy)) {
+				XNextEvent(xw.dpy, &ev);
+				if (handler[ev.type])
+					(handler[ev.type])(&ev);
+			}
+		}
 	}
+	free(ie);
 }
 
 void
@@ -734,11 +758,28 @@ main(int argc, char *argv[])
 		fp = stdin;
 	else if (!(fp = fopen(fname = argv[0], "r")))
 		die("sent: Unable to open '%s' for reading:", fname);
+
 	load(fp);
 	fclose(fp);
 
+	char *slash = strrchr(fname, '/');
+	if (slash) {
+		fpart = strdup(slash + 1);
+		dpart = strdup(fname);
+		dpart[slash - fname + 1] = '\0';
+	} else {
+		fpart = strdup(fname);
+		dpart = strdup("./");
+	}
+	inotify = inotify_init1(IN_NONBLOCK);
+	inotify_add_watch(inotify, dpart, IN_CLOSE_WRITE|IN_MOVED_TO);
+
 	xinit();
 	run();
+
+	free(dpart);
+	free(fpart);
+	close(inotify);
 
 	cleanup(0);
 	return 0;
