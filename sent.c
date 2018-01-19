@@ -98,7 +98,11 @@ static void getfontsize(Slide *s, unsigned int *width, unsigned int *height);
 static void cleanup(int slidesonly);
 static void reload(const Arg *arg);
 static void load(FILE *fp);
+static void count(const Arg *arg);
+static void slide(int new_idx);
 static void advance(const Arg *arg);
+static void advanceto(const Arg *arg);
+static void advancetocount(const Arg *arg);
 static void quit(const Arg *arg);
 static void resize(int width, int height);
 static void run();
@@ -121,6 +125,7 @@ static void configure(XEvent *);
 static const char *fname = NULL;
 static char *dpart, *fpart;
 static Slide *slides = NULL;
+static int ct = 0;
 static int idx = 0;
 static int slidecount = 0;
 static XWindow xw;
@@ -506,9 +511,14 @@ load(FILE *fp)
 }
 
 void
-advance(const Arg *arg)
+count(const Arg *arg)
 {
-	int new_idx = idx + arg->i;
+	ct = ct * 10 + arg->i;
+}
+
+void
+slide(int new_idx)
+{
 	LIMIT(new_idx, 0, slidecount-1);
 	if (new_idx != idx) {
 		if (slides[idx].img)
@@ -516,6 +526,32 @@ advance(const Arg *arg)
 		idx = new_idx;
 		xdraw();
 	}
+}
+
+void
+advance(const Arg *arg)
+{
+	if (ct == 0)
+		slide(idx + arg->i);
+	else
+		slide(idx + arg->i * ct);
+	ct = 0;
+}
+
+void
+advanceto(const Arg *arg)
+{
+	int new_idx = arg->i;
+	if (new_idx < 0)
+		new_idx += slidecount;
+	slide(new_idx);
+}
+
+void
+advancetocount(const Arg *arg)
+{
+	slide(ct);
+	ct = 0;
 }
 
 void

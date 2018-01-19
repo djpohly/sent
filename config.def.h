@@ -45,7 +45,15 @@ static Shortcut shortcuts[] = {
 	{ XK_Up,          advance,        {.i = -1} },
 	{ XK_Next,        advance,        {.i = +1} },
 	{ XK_Prior,       advance,        {.i = -1} },
+	{ XK_Begin,       advanceto,      {.i =  0} },
+	{ XK_z,           advanceto,      {.i = -1} },
+	{ XK_End,         advanceto,      {.i = -1} },
+	{ XK_g,           advancetocount, {0} },
 	{ XK_r,           reload,         {0} },
+#define D(n) \
+	{ XK_##n,         count,          {.i = (n)} }
+	D(0), D(1), D(2), D(3), D(4), D(5), D(6), D(7), D(8), D(9),
+#undef D
 };
 
 static Filter filters[] = {
