@@ -99,6 +99,7 @@ static void cleanup(int slidesonly);
 static void reload(const Arg *arg);
 static void load(FILE *fp);
 static void count(const Arg *arg);
+static void slidenum(const Arg *arg);
 static void slide(int new_idx);
 static void advance(const Arg *arg);
 static void advanceto(const Arg *arg);
@@ -514,6 +515,12 @@ void
 count(const Arg *arg)
 {
 	ct = ct * 10 + arg->i;
+}
+
+void
+slidenum(const Arg *arg)
+{
+	fprintf(stderr, "%d\n", idx);
 }
 
 void

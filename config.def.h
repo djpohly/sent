@@ -49,6 +49,7 @@ static Shortcut shortcuts[] = {
 	{ XK_z,           advanceto,      {.i = -1} },
 	{ XK_End,         advanceto,      {.i = -1} },
 	{ XK_g,           advancetocount, {0} },
+	{ XK_m,           slidenum,       {0} },
 	{ XK_r,           reload,         {0} },
 #define D(n) \
 	{ XK_##n,         count,          {.i = (n)} }
