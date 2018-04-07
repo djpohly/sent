@@ -520,7 +520,7 @@ count(const Arg *arg)
 void
 slidenum(const Arg *arg)
 {
-	fprintf(stderr, "%d\n", idx);
+	printf("%d\n", idx);
 }
 
 void
